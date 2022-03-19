@@ -54,7 +54,7 @@ turn! should only take bacterium (self) as input; sense! should take bacterium a
         "ReorientationRate" => 1.0, # 1/s, typical value for E.coli
         "RunState" => 1, # currently only used for run-reverse-flick motility; 1=reverse 0=flick
         "PrevPosition" => r,
-        "PrevVelocity", => v,
+        "PrevVelocity" => v,
     )
 end # state
 
