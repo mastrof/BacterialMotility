@@ -2,6 +2,7 @@ export
     run!,
     rotate2D!, rotate3D!,
     Degenerate,
+    rotational_diffusion!,
     tumble!, reverse!, flick!, reverse_flick!
 
 
@@ -55,6 +56,22 @@ struct Degenerate{T<:Real} <: ContinuousUnivariateDistribution
 end # struct
 
 Base.rand(d::Degenerate) = d.x
+
+
+function rotational_diffusion!(bacterium::B, dt, PDF=σ->Normal(0,σ)) where B<:AbstractBacterium{2}
+    Drot = bacterium.state["RotationalDiffusivity"] # rad²/s
+    Drot == 0 && return
+    σ = sqrt(2*Drot*dt) # rad
+    rotate2D!(bacterium.v, rand(PDF(σ)))
+end # function
+
+function rotational_diffusion!(bacterium::B, dt, PDF=σ->Normal(0,σ)) where B<:AbstractBacterium{3}
+    Drot = bacterium.state["RotationalDiffusivity"] # rad²/s
+    Drot == 0 && return
+    σ = sqrt(2*Drot*dt) # rad
+    rotate3D!(bacterium.v, rand(PDF(σ)))
+end # function
+
 
 reverse!(bacterium::B, PDF=Degenerate(π)) where B<:AbstractBacterium{2} = rotate2D!(bacterium.v, rand(PDF))
 reverse!(bacterium::B, PDF=Degenerate(π)) where B<:AbstractBacterium{3} = rotate3D!(bacterium.v, rand(PDF))
