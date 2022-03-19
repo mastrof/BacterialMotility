@@ -1,6 +1,7 @@
 export
     run!,
     rotate2D!, rotate3D!,
+    Degenerate,
     tumble!, reverse!, flick!, reverse_flick!
 
 

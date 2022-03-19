@@ -1,8 +1,12 @@
 export
-    AbstractField, AnalyticField,
+    AbstractField, EmptyField, AnalyticField,
     Concentration_SteadyDiffusionSphericalSource_3D
 
 abstract type AbstractField end
+
+struct EmptyField <: AbstractField
+    ;
+end # struct
 
 @with_kw struct AnalyticField <: AbstractField
     ϕ::Function

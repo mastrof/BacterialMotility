@@ -10,7 +10,7 @@ Perform a single integration step over the interval dt, composed as:
     2) sensing
     3) reorientation attempt
 """
-function step!(bacterium::B, dt, f::F) where {B<:AbstractBacterium,F<:AbstractField}
+function step!(bacterium::B, dt, f::F=EmptyField) where {B<:AbstractBacterium,F<:AbstractField}
     bacterium.run!(bacterium, dt)
     bacterium.sense!(bacterium, f)
     if rand() < bacterium.state["ReorientationRate"] * dt
@@ -19,7 +19,7 @@ function step!(bacterium::B, dt, f::F) where {B<:AbstractBacterium,F<:AbstractFi
 end # function
 
 
-function step!(bacteria::T, dt, f::F) where {B<:AbstractBacterium,T<:AbstractVector{B},F<:AbstractField}
+function step!(bacteria::T, dt, f::F=EmptyField) where {B<:AbstractBacterium,T<:AbstractVector{B},F<:AbstractField}
     for bacterium in bacteria
         step!(bacterium, dt, f)
     end # for

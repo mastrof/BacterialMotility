@@ -61,5 +61,3 @@ end # state
 Bacterium{D,T}(; kwargs...) where {D,T} = Bacterium{D,T,Function,InternalState}(; kwargs...)
 Bacterium{D}(; kwargs...) where D = Bacterium{D,Float64,Function,InternalState}(; kwargs...)
 Bacterium(; kwargs...) = Bacterium{3,Float64,Function,InternalState}(; kwargs...)
-
-
