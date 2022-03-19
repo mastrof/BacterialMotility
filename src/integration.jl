@@ -1,3 +1,6 @@
+export
+    step!
+
 @doc raw"""
     step!(bacterium::B, dt, f::F) where {B<:AbstractBacterium,F<:AbstractField}
     step!(bacteria::T, dt, f::F) where {B<:AbstractBacterium,T<:AbstractVector{B},F<:AbstractField}

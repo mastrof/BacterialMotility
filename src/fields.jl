@@ -1,3 +1,7 @@
+export
+    AbstractField, AnalyticField,
+    Concentration_SteadyDiffusionSphericalSource_3D
+
 abstract type AbstractField end
 
 @with_kw struct AnalyticField <: AbstractField
