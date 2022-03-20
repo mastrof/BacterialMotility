@@ -1,19 +1,25 @@
 export
-    AbstractInternalState, StateValue, InternalState,
+    AbstractProperties, properties
     AbstractBacterium, Bacterium
-    
-    
 
-AbstractInternalState = AbstractDict{String}
-StateValue = Union{Real, Array}
-InternalState = Dict{String, StateValue}
+
+AbstractProperties = AbstractDict{String}
+PropertyValue = Union{Real, Array}
+Properties = Dict{String, PropertyValue}
+DefaultProperties = Properties(
+    "Radius" => 0.5, # μm, typical value for E.coli
+    "ReorientationRate" => 1.0, # 1/s, typical value for E.coli
+    "RunState" => 1, # currently only used for run-reverse-flick motility; 1=reverse 0=flick
+    "RotationalDiffusivity" => 0.0 # rad²/s
+)
+properties(x...) = merge(DefaultProperties, Properties(x...))
 
 function dummy(x...)
     ;
 end
 
 @doc raw"""
-    AbstractBacterium{D,T,F<:Function,S<:AbstractInternalState}
+    AbstractBacterium{D,T,F<:Function,S<:AbstractProperties}
 
 General interface for bacterium object.
     - `D`: dimensionality of the space in which the bacterium lives
@@ -37,7 +43,7 @@ All arguments and parameters are optional.
 If parameters D and T are not given, they are assumed to be D=3 and T=Float64.
 If r and v are not defined, they are initialized to zeros(T,D).
 If run!, turn!, sense! are not defined, they are assigned to a dummy function that does nothing.
-Some standard values (based on E.coli) are provided by default in state.
+Some standard properties are provided by default for state.
 
 Ideally, `run!` should take two parameters, bacterium (self) and an externally provided integration timestep;
 turn! should only take bacterium (self) as input; sense! should take bacterium and an instance of AbstractField.
@@ -49,15 +55,9 @@ turn! should only take bacterium (self) as input; sense! should take bacterium a
     run!::F = dummy # displacement
     turn!::F = dummy # reorientation
     sense!::F = dummy # kinetic/tactic behavior
-    state::S = InternalState(
-        "Radius" => 0.5, # μm, typical value for E.coli
-        "ReorientationRate" => 1.0, # 1/s, typical value for E.coli
-        "RunState" => 1, # currently only used for run-reverse-flick motility; 1=reverse 0=flick
-        "PrevPosition" => r,
-        "PrevVelocity" => v,
-    )
+    state::S = properties()
 end # state
 
-Bacterium{D,T}(; kwargs...) where {D,T} = Bacterium{D,T,Function,InternalState}(; kwargs...)
-Bacterium{D}(; kwargs...) where D = Bacterium{D,Float64,Function,InternalState}(; kwargs...)
-Bacterium(; kwargs...) = Bacterium{3,Float64,Function,InternalState}(; kwargs...)
+Bacterium{D,T}(; kwargs...) where {D,T} = Bacterium{D,T,Function,Properties}(; kwargs...)
+Bacterium{D}(; kwargs...) where D = Bacterium{D,Float64,Function,Properties}(; kwargs...)
+Bacterium(; kwargs...) = Bacterium{3,Float64,Function,Properties}(; kwargs...)
