@@ -82,15 +82,10 @@ flick!(bacterium::B, PDF=Degenerate(π/2)) where B<:AbstractBacterium{3} = rotat
     reverse_flick!(bacterium::B, PDFreverse=Degenerate(π), PDFflick=Degenerate(π/2)) where B<:AbstractBacterium{D}
 
 Depending on its internal `RunState` bacterium performs either a reverse or a flick, with angular distributions respectively PDFreverse and PDFflick.
-If the bacterium does not have a `RunState` entry as state variable, it is created in place and initialized randomly to either 1 (reverse) or 0 (flick).
 After a reverse, the run state is switched to flick mode and viceversa.
 Implemented for D=2 and D=3.
 """
 function reverse_flick!(bacterium::B, PDFreverse=Degenerate(π), PDFflick=Degenerate(π/2)) where B<:AbstractBacterium
-    # if bacterium doesn't have a "RunState" key, create it with random initial value 0 or 1
-    if !haskey(bacterium.state, "RunState")
-        bacterium.state["RunState"] = rand([0,1])
-    end # if
     if Bool(bacterium.state["RunState"]) # == 1 then reverse
         reverse!(bacterium, PDFreverse)
         bacterium.state["RunState"] = 0
