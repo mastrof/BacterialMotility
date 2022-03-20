@@ -1,5 +1,5 @@
 export
-    AbstractProperties, properties
+    AbstractProperties, Properties, properties,
     AbstractBacterium, Bacterium
 
 
