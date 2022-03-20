@@ -25,7 +25,7 @@ General interface for bacterium object.
     - `D`: dimensionality of the space in which the bacterium lives
     - `T`: type of the space in which the bacterium lives
 """
-abstract type AbstractBacterium{D,T,F<:Function,S<:AbstractInternalState} end
+abstract type AbstractBacterium{D,T,F<:Function,S<:AbstractProperties} end
 
 @doc raw"""
     struct Bacterium{D,T,F,S} <: AbstractBacterium{D,T,F,S}
@@ -40,7 +40,7 @@ Concrete type for bacterium with sensing capabilities and one (or multiple) inte
     - `state::S`: properties, geometry, internal state variables
 
 All arguments and parameters are optional.
-If parameters D and T are not given, they are assumed to be D=3 and T=Float64.
+If parameters D and T are not given, they are assumed to be D=3 and T=Float64. F<:Function and S<:AbstractProperties.
 If r and v are not defined, they are initialized to zeros(T,D).
 If run!, turn!, sense! are not defined, they are assigned to a dummy function that does nothing.
 Some standard properties are provided by default for state.
