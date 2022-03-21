@@ -12,4 +12,7 @@ include("motion.jl")
 include("sensing.jl")
 include("integration.jl")
 
+# model-specific implementations
+include("Brumley.jl")
+
 end # module
