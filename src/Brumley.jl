@@ -12,9 +12,7 @@ DefaultPropertiesBrumley = Properties(
     "AdaptationTime" => 1.3, # s
     "RunTimeUnbiased" => 0.45, # s
     "NutrientDiffusivity" => 608.0, # μm²s
-    "IntegrationTimestep" => 0.1, # s
     "ReorientationRate" => 1/0.45, # 1/s
-    "MemoryFactor" => exp(-0.1/1.3), #
 )
 
 propertiesBrumley(x...) = properties(DefaultPropertiesBrumley..., x...)
@@ -33,7 +31,7 @@ function affect_Brumley!(bacterium, ϕ, ∇ϕ)
     Π = bacterium.state["ChemotacticPrecision"]
     T = bacterium.state["SensoryTime"]
     S = bacterium.state["InternalState"]
-    α = bacterium.state["MemoryFactor"]
+    α = exp(-T/tM) # memory persistence factor
     T³ = T*T*T
     μ = Uᵣ * ∇ϕ # mean concentration gradient at current position
     σ = Π * sqrt(3.0*ϕ / (π*a*Dc*T³)) # sensing noise at current position

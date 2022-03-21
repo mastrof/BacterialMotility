@@ -6,6 +6,7 @@ using Distributions
 using Rotations
 using Parameters
 
+include("properties.jl")
 include("types.jl")
 include("fields.jl")
 include("motion.jl")
