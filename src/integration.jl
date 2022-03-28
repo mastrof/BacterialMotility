@@ -14,7 +14,8 @@ function step!(bacterium::B, f::F=EmptyField) where {B<:AbstractBacterium,F<:Abs
     dt = bacterium.state["IntegrationTimestep"]
     bacterium.run!(bacterium, dt)
     bacterium.sense!(bacterium, f)
-    if rand() < bacterium.state["ReorientationRate"] * dt
+    ν = bacterium.state["ReorientationRate"]
+    if rand() < ν * dt
         bacterium.turn!(bacterium)
     end # if
 end # function

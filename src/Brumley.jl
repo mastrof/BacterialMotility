@@ -36,7 +36,7 @@ function affect_Brumley!(bacterium, ϕ, ∇ϕ)
     μ = Uᵣ * ∇ϕ # mean concentration gradient at current position
     σ = Π * sqrt(3.0*ϕ / (π*a*Dc*T³)) # sensing noise at current position
     M = rand(Normal(μ,σ)) # gradient measurement
-    S = κ*tM*M + (S - κ*tM*M)*α
+    S = (1-α)*κ*tM*M + α*S
     bacterium.state["InternalState"] = S
     ν = (1.0 + exp(-Γ*S)) / (2.0*τ₀)
     bacterium.state["ReorientationRate"] = min(ν, 1.0/dt)

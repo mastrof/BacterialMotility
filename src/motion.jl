@@ -86,11 +86,11 @@ After a reverse, the run state is switched to flick mode and viceversa.
 Implemented for D=2 and D=3.
 """
 function reverse_flick!(bacterium::B, PDFreverse=Degenerate(π), PDFflick=Degenerate(π/2)) where B<:AbstractBacterium
-    if Bool(bacterium.state["RunState"]) # == 1 then reverse
+    s = bacterium.state["RunState"]
+    if s == 1 # then reverse
         reverse!(bacterium, PDFreverse)
-        bacterium.state["RunState"] = 0
     else # == 0 then flick
         flick!(bacterium, PDFflick)
-        bacterium.state["RunState"] = 1
     end # if
+    bacterium.state["RunState"] = 1-s
 end # function
