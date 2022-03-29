@@ -1,6 +1,5 @@
 export
-    run!,
-    rotate2D!, rotate3D!,
+    run!, rotate!,
     Degenerate,
     rotational_diffusion!,
     tumble!, reverse!, flick!, reverse_flick!
@@ -15,21 +14,15 @@ function run!(bacterium::B, dt) where B<:AbstractBacterium
     @. bacterium.r += bacterium.v * dt
 end # function
 
-@doc raw"""
-    rotate2D!(w, θ)
+function rotate!(w::T) where T<:StaticVector{1}
+     w .= -w
+end # function
 
-Rotate two-dimensional vector w of an angle θ.
-"""
-function rotate2D!(w, θ)
+function rotate!(w::T, θ) where T<:StaticVector{2}
     w .= Angle2d(θ) * w
 end # function
 
-@doc raw"""
-    rotate3D!(w, θ)
-
-Rotate three-dimensional vector w of an angle θ (in radians) with uniform off-axis distribution.
-"""
-function rotate3D!(w, θ)
+function rotate!(w::T, θ) where T<:StaticVector{3}
     m = findfirst(w .≠ 0.0)
     n = m%3 + 1
     u = zero(w)
@@ -42,13 +35,13 @@ end # function
 
 
 @doc raw"""
-    tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium{D}
+    tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium
 
 Bacterium performs a tumble in D-dimensional space with angular distribution given by PDF.
-Implemented for D=2 and D=3.
+Implemented for D=1,2,3. In D=1 the tumble is just a reversal.
 """
-tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium{2} = rotate2D!(bacterium.v, rand(PDF))
-tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium{3} = rotate3D!(bacterium.v, rand(PDF))
+tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium{1} = rotate!(bacterium.v)
+tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium = rotate!(bacterium.v, rand(PDF))
 
 
 struct Degenerate{T<:Real} <: ContinuousUnivariateDistribution
@@ -58,25 +51,17 @@ end # struct
 Base.rand(d::Degenerate) = d.x
 
 
-function rotational_diffusion!(bacterium::B, dt, PDF=σ->Normal(0,σ)) where B<:AbstractBacterium{2}
+function rotational_diffusion!(bacterium::B, PDF=σ->Normal(0,σ)) where B<:AbstractBacterium
     Drot = bacterium.state["RotationalDiffusivity"] # rad²/s
     Drot == 0 && return
+    dt = bacterium.state["IntegrationTimestep"] # s
     σ = sqrt(2*Drot*dt) # rad
-    rotate2D!(bacterium.v, rand(PDF(σ)))
-end # function
-
-function rotational_diffusion!(bacterium::B, dt, PDF=σ->Normal(0,σ)) where B<:AbstractBacterium{3}
-    Drot = bacterium.state["RotationalDiffusivity"] # rad²/s
-    Drot == 0 && return
-    σ = sqrt(2*Drot*dt) # rad
-    rotate3D!(bacterium.v, rand(PDF(σ)))
+    rotate!(bacterium.v, rand(PDF(σ)))
 end # function
 
 
-reverse!(bacterium::B, PDF=Degenerate(π)) where B<:AbstractBacterium{2} = rotate2D!(bacterium.v, rand(PDF))
-reverse!(bacterium::B, PDF=Degenerate(π)) where B<:AbstractBacterium{3} = rotate3D!(bacterium.v, rand(PDF))
-flick!(bacterium::B, PDF=Degenerate(π/2)) where B<:AbstractBacterium{2} = rotate2D!(bacterium.v, rand(PDF))
-flick!(bacterium::B, PDF=Degenerate(π/2)) where B<:AbstractBacterium{3} = rotate3D!(bacterium.v, rand(PDF))
+reverse!(bacterium::B, PDF=Degenerate(π)) where B<:AbstractBacterium = rotate!(bacterium.v, rand(PDF))
+flick!(bacterium::B, PDF=Degenerate(π/2)) where B<:AbstractBacterium = rotate!(bacterium.v, rand(PDF))
 
 @doc raw"""
     reverse_flick!(bacterium::B, PDFreverse=Degenerate(π), PDFflick=Degenerate(π/2)) where B<:AbstractBacterium{D}
