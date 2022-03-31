@@ -12,3 +12,5 @@ The library currently includes:
 - common external fields
     * steady-state concentration field from a leaking spherical source
 
+
+![A simple simulation with different motile patterns](https://github.com/mastrof/BacterialMotility/blob/main/scripts/simple.gif)
