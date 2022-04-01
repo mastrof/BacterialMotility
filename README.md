@@ -13,4 +13,8 @@ The library currently includes:
     * steady-state concentration field from a leaking spherical source
 
 
+## Examples from the library
+### Different motile patterns
 ![A simple simulation with different motile patterns](https://github.com/mastrof/BacterialMotility/blob/main/scripts/simple.gif)
+### Rotational diffusion
+![Run-tumble motility with and without rotational diffusion](https://github.com/mastrof/BacterialMotility/blob/main/scripts/rotational-diffusion.gif)
