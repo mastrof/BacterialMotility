@@ -8,6 +8,7 @@ The library currently includes:
     * run-and-tumble
     * run-reverse-flick
 - agent-based models of chemotaxis
+    * Brown and Berg 1974 PNAS
     * Brumley et al. 2019 PNAS
 - common external fields
     * steady-state concentration field from a leaking spherical source
@@ -20,3 +21,5 @@ The library currently includes:
 ![Run-tumble motility with and without rotational diffusion](https://github.com/mastrof/BacterialMotility/blob/main/scripts/rotational-diffusion.gif)
 ### Chemotaxis (Brumley et al. 2019 PNAS)
 ![Random walk vs perfect chemotaxis vs noisy chemotaxis](https://github.com/mastrof/BacterialMotility/blob/main/scripts/brumley.gif)
+### Chemotaxis (Brown and Berg 1974 PNAS)
+![Random walk vs chemotaxis](https://github.com/mastrof/BacterialMotility/blob/main/scripts/brownberg.gif)
