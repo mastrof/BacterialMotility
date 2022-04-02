@@ -3,84 +3,153 @@ using LinearAlgebra
 using Distributions
 using Plots
 
-include("/home/riccardo/Templates/juliaplots_templates/plots_template.jl")
 
-
-function circleShape(h, k, r)
-    θ = LinRange(0, 2π, 500)
-    h .+ r.*sin.(θ), k .+ r.*cos.(θ)
-end # function
-
-
-Lbox = 1.2e3 # μm
+#== system geometry ==#
+L = 1000 # μm
 d = 3 # dimensionality
-U = 30.0 # μm/s, speed, same for all species
 
-# convenience functions
-randposition() = (rand(d) .- 1/2) .* (Lbox/2)
+#== convenience functions ==#
+randposition() = (rand(d) .- 1/2) .* (L/2)
 function randvelocity(d,U)
     x = rand(d) .- 1/2
     x ./ norm(x) .* U
 end # function
 randvelocity(U) = randvelocity(d,U)
 
-custom_tumble!(bacterium) = tumble!(bacterium, Degenerate(π/4))
-custom_revflick!(bacterium) = reverse_flick!(bacterium, Normal(π,π/8), Uniform(1π/8,3π/8))
+
+#== motile patterns ==#
+custom_revflick!(bacterium) = reverse_flick!(bacterium, Normal(π,π/8), Normal(π/2,π/8))
 
 
-function runsim!(traj, steps, population, f; save_every=1)
-    i = 1
-    for t in 1:nsteps
-        step!(population, f)
-        if (t-1) % save_every == 0
-            for n in 1:num_bacteria
-                traj[i,n,:] .= population[n].r
-            end # for
-            i += 1
-        end # if
-    end # for
-end # function
-
-
-R = 100.0
-C = 6.0
-Cbg = 0.0
+#== field setup ==#
+R = 20.0
+C = 1.0
+Cbg = 0.01
 f = Concentration_SteadyDiffusionSphericalSource_3D(R=R, C=C, Cbg=Cbg)
-s = propertiesBrumley("ChemotacticPrecision" => 0.0)
 
 
-# create population composed by different bacteria in different numbers
-species = ["RT (Chemo,π/4)", "RRF (Brumley)", "RRF (No chemo)", "RRF (Boh)"]
-pop1 = [BacteriumBrumley(id = species[1], r = randposition(), v = randvelocity(30.0), turn! = custom_tumble!, state=s) for _ in 1:3]
-pop2 = [BacteriumBrumley(id = species[2], r = randposition(), v = randvelocity(46.5), turn! = reverse_flick!, state=s) for _ in 1:3]
-pop3 = [Bacterium{3}(id = species[3], r = randposition(), v = randvelocity(46.5), run! = run!, turn! = reverse_flick!) for _ in 1:3]
-pop4 = [Bacterium{3}(id = species[4], r = randposition(), v = randvelocity(26.5), run! = run!, turn! = custom_revflick!) for _ in 1:3]
-population = vcat(pop1, pop2, pop3, pop4)
+#== population setup ==#
+s1 = propertiesBrumley("MotorGain" => 0.0, "ReceptorGain" => 0.0,
+                       "RotationalDiffusivity" => 0.035) # no chemotaxis
+s2 = propertiesBrumley("ChemotacticPrecision" => 0.0,
+                       "RotationalDiffusivity" => 0.035) # perfect chemotaxis
+s3 = propertiesBrumley("ChemotacticPrecision" => 3.0,
+                       "RotationalDiffusivity" => 0.035) # noisy chemotaxis
+
+species = ["Random Walk", "Perfect Chemotaxis", "Noisy Chemotaxis"]
+N = 50
+pop1 = [BacteriumBrumley(
+    id = species[1], r = randposition(), v = randvelocity(46.5),
+    turn! = custom_revflick!, state = copy(s1)) for _ in 1:N]
+pop2 = [BacteriumBrumley(
+    id = species[2], r = randposition(), v = randvelocity(46.5),
+    turn! = custom_revflick!, state = copy(s2)) for _ in 1:10]
+pop3 = [BacteriumBrumley(
+    id = species[3], r = randposition(), v = randvelocity(46.5),
+    turn! = custom_revflick!, state = copy(s3)) for _ in 1:N]
+
+population = vcat(pop1, pop2, pop3)
 num_bacteria = length(population)
 
+#== callbacks ==#
+callback(b,f) = rotational_diffusion!(b)
 
-nsteps = 500
-save_every = 1
-trajectories = zeros(nsteps÷save_every, num_bacteria, d)
+#== simulation ==#
+nsteps = 800
+trajectories = zeros(nsteps, num_bacteria, d)
+for t in 1:nsteps
+    step!(population, f; callback_inner=callback)
+    for n in 1:num_bacteria
+        trajectories[t,n,:] .= population[n].r
+    end # for
+end # for
 
-runsim!(trajectories, nsteps, population, f; save_every=save_every)
+
+
+#== plot setup ==#
+plot_style(palette=:tab10) = (
+    thickness_scaling = 1.5,
+    guidefontsize = 12,
+    tickfontsize = 12,
+    legendfontsize = 8,
+    grid = false,
+    framestyle = :box,
+    minorticks = true,
+    tick_direction = :in,
+    color_palette = palette,
+    margin=3Plots.mm,
+)
+
+@userplot TailPlot
+@recipe function f(p::TailPlot)
+    traj, t1, t2, = p.args
+    x = @view traj[t1:t2,:,1]
+    y = @view traj[t1:t2,:,2]
+    seriestype := :path
+    linewidth --> 0.5
+    label --> false
+    x, y
+end # recipe
+
+@userplot HeadPlot
+@recipe function f(p::HeadPlot)
+    traj, t, = p.args
+    x = @view traj[t,:,1]
+    y = @view traj[t,:,2]
+    seriestype := :scatter
+    marker --> :circle
+    markersize --> 3
+    markerstrokewidth --> 0
+    label --> false
+    x, y
+end # recipe
 
 
 speciescolor = Dict(species .=> 1:length(species))
+specieslabels = species
 linecolor = [speciescolor[bact.id] for _ in 1:1, bact in population]
 
-plot(;plot_style(:Dark2)...)
+function cfield(x,y)
+    r = sqrt(x*x+y*y)
+    r < R ? Cbg+C : Cbg+C*R/r
+end # function
+clims = (cfield(L/2,L/2), cfield(0,0))
+xx = yy = -L/2:4:L/2
+cc = cfield.(xx',yy)
 
-plot!(circleShape(0,0,R), seriestype=:shape, lw=0.0,
-      c=length(species)+1, lab=false, fillalpha=0.5)
+bgcolor = RGB(0.07, 0.07, 0.07)
 
-plot!(trajectories[:,:,1], trajectories[:,:,2],# trajectories[:,:,3],
-      lab=false, lw=1,
-      linealpha=range(0.2, 1; length=nsteps), lc=linecolor)
-
-for i in 1:length(species)
-    plot!([0.0], [0.0], lab=species[i], lc=speciescolor[species[i]], legend=:topright, legendfontsize=5)
+#== plot animation ==#
+Δt = 0.1
+ltail = 17
+for t in 2:2:nsteps
+    p = plot(;plot_style(:Dark2)...)
+    plot!(p, lims=(-L/2,L/2), aspect_ratio=1, axis=false,
+          bgcolor=bgcolor,  size=(600,600))
+    t0 = max(t-ltail, 1)
+    heatmap!(p, xx, yy, cc, c=:bone, clims=clims, cbar=false)
+    tailplot!(p, trajectories, t0, t; lc=linecolor)
+    headplot!(p, trajectories, t; mc=permutedims(linecolor))
+    for i in 1:length(species)
+        plot!(p, [0.0], [0.0], lab=specieslabels[i],
+              c=speciescolor[species[i]],
+              leg=:topright, legendfontsize=5,
+              legendfontcolor=:white)
+    end # for
+    δx = 100 # μm
+    xbar0 = -L/2 + L/30
+    xbar1 = xbar0 + δx
+    ybar = -L/2+L/40
+    plot!(p, [xbar0, xbar1], [ybar, ybar], lc=:white, lw=4, lab=false)
+    annotate!(p, xbar0+δx/2, ybar+22,
+              text("100 μm", :center, :white, 8))
+    xtime = L/2 - L/40
+    ytime = ybar
+    tnow = lpad(round(t*Δt, digits=1), 5, ' ')
+    annotate!(p, xtime, ytime,
+              text("t = $(tnow) s", :right, :white, 8))
+    ndx = lpad(t-1, 4, '0')
+    savefig(p, "frame$ndx.png")
 end # for
 
-plot!(aspect_ratio=1)
 
