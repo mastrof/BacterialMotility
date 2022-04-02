@@ -18,3 +18,5 @@ The library currently includes:
 ![A simple simulation with different motile patterns](https://github.com/mastrof/BacterialMotility/blob/main/scripts/simple.gif)
 ### Rotational diffusion
 ![Run-tumble motility with and without rotational diffusion](https://github.com/mastrof/BacterialMotility/blob/main/scripts/rotational-diffusion.gif)
+### Chemotaxis (Brumley et al. 2019 PNAS)
+![Random walk vs perfect chemotaxis vs noisy chemotaxis](https://github.com/mastrof/BacterialMotility/blob/main/scripts/brumley.gif)
