@@ -15,5 +15,6 @@ include("integration.jl")
 
 # model-specific implementations
 include("Brumley.jl")
+include("BrownBerg.jl")
 
 end # module
