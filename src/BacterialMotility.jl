@@ -7,7 +7,7 @@ using Rotations
 using Parameters
 
 include("properties.jl")
-include("types.jl")
+include("bacterium.jl")
 include("fields.jl")
 include("motion.jl")
 include("sensing.jl")
