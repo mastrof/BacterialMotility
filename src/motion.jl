@@ -44,13 +44,6 @@ tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium{1} = rotate
 tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium = rotate!(bacterium.v, rand(PDF))
 
 
-struct Degenerate{T<:Real} <: ContinuousUnivariateDistribution
-    x::T
-end # struct
-
-Base.rand(d::Degenerate) = d.x
-
-
 function rotational_diffusion!(bacterium::B, PDF=σ->Normal(0,σ)) where B<:AbstractBacterium
     Drot = bacterium.state["RotationalDiffusivity"] # rad²/s
     Drot == 0 && return

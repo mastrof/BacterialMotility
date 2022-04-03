@@ -1,10 +1,6 @@
 export
     AbstractBacterium, Bacterium
 
-function dummy(x...)
-    ;
-end
-
 @doc raw"""
     AbstractBacterium{D,T}
 
