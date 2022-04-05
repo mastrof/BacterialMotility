@@ -3,19 +3,43 @@ export
     affect_Brumley!,
     BacteriumBrumley
 
-DefaultPropertiesBrumley = Properties(
-    "ReceptorGain" => 50.0, # 1/μM
-    "MotorGain" => 50.0, # 
-    "ChemotacticPrecision" => 6.0, # 
-    "InternalState" => 0.0, # 
-    "SensoryTime" => 0.1, # s
-    "AdaptationTime" => 1.3, # s
-    "RunTimeUnbiased" => 0.45, # s
-    "NutrientDiffusivity" => 608.0, # μm²s
-    "ReorientationRate" => 1/0.45, # 1/s
-)
-
-propertiesBrumley(x...) = properties(DefaultPropertiesBrumley..., x...)
+function propertiesBrumley(x...)
+    DefaultPropertiesBrumley = Properties(
+        "ReceptorGain" => 50.0, # 1/μM
+        "MotorGain" => 50.0, # 
+        "ChemotacticPrecision" => 6.0, # 
+        "InternalState" => 0.0, # 
+        "SensoryTime" => 0.1, # s
+        "AdaptationTime" => 1.3, # s
+        "RunTimeUnbiased" => 0.45, # s
+        "NutrientDiffusivity" => 608.0, # μm²s
+        "ReorientationRate" => 1/0.45, # 1/s
+    )
+    i = findfirst("SensoryTime" .== first.(x))
+    j = findfirst("IntegrationTimestep" .== first.(x))
+    if isnothing(i) && isnothing(j)
+        properties(DefaultPropertiesBrumley..., x...)
+    elseif isnothing(i)
+        dt = x[j][2]
+        properties(DefaultPropertiesBrumley..., x...,
+                   "SensoryTime" => dt)
+    elseif isnothing(j)
+        T = x[i][2]
+        properties(DefaultPropertiesBrumley..., x...,
+                   "IntegrationTimestep" => T)
+    else
+        dt = x[j][2]
+        T = x[i][2]
+        if dt == T
+            properties(DefaultPropertiesBrumley..., x...)
+        else
+            @warn "IntegrationTimestep must be equal to SensoryTime." *
+                "\n" * "IntegrationTimestep will be set to the value $T."
+            properties(DefaultPropertiesBrumley..., x...,
+                       "IntegrationTimestep" => T)
+        end # if
+    end # if
+end # function
 
 function affect_Brumley!(bacterium, ϕ, ∇ϕ)
     r = bacterium.r
