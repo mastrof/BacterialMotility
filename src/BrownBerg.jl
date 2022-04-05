@@ -4,14 +4,15 @@ export
     affect_BrownBerg!,
     BacteriumBrownBerg
 
-DefaultPropertiesBrownBerg = Properties(
-    "AdaptationTime" => 1.0, # s
-    "RunTimeUnbiased" => 0.67, # s
-    "ReceptorBindingConstant" => 100.0, # μM
-    "MotorGain" => 660.0 # s
-)
-
-propertiesBrownBerg(x...) = properties(DefaultPropertiesBrownBerg..., x...)
+function propertiesBrownBerg(x...)
+    DefaultPropertiesBrownBerg = Properties(
+        "AdaptationTime" => 1.0, # s
+        "RunTimeUnbiased" => 0.67, # s
+        "ReceptorBindingConstant" => 100.0, # μM
+        "MotorGain" => 660.0 # s
+    )
+    properties(DefaultPropertiesBrownBerg..., x...)
+end # function
 
 memoryBrownBerg(nsteps) = Dict(
     "NumSteps" => 0,
