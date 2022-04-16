@@ -73,7 +73,7 @@ end # function
     v::MVector{3,Float64} = zeros(MVector{3,Float64})
     run! = run!
     turn! = reverse_flick!
-    sense! = (b,f) -> sense_f_∇f!(b, f, affect_Brumley!)
+    sense! = (b, f; kwargs...) -> sense_f_∇f!(b, f, affect_Brumley!; kwargs...)
     state = propertiesBrumley()
 end # struct
 

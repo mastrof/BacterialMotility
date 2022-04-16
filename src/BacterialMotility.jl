@@ -6,17 +6,7 @@ using Distributions
 using Rotations
 using Parameters
 
-
-function dummy(args...; kwargs...)
-    ;
-end
-
-struct Degenerate{T<:Real} <: ContinuousUnivariateDistribution
-    x::T
-end # struct
-
-Base.rand(d::Degenerate) = d.x
-
+include("utils.jl")
 
 include("properties.jl")
 include("bacterium.jl")
@@ -24,6 +14,7 @@ include("fields.jl")
 include("motion.jl")
 include("sensing.jl")
 include("integration.jl")
+include("bacterialsystem.jl")
 
 # model-specific implementations
 include("Brumley.jl")

@@ -46,7 +46,7 @@ end # function
     v::MVector{D,Float64} = zeros(MVector{D,Float64})
     run! = run!
     turn! = tumble!
-    sense! = (b,f) -> sense_f_∇f!(b, f, affect_BrownBerg!)
+    sense! = (b, f; kwargs...) -> sense_f_∇f!(b, f, affect_BrownBerg!; kwargs...)
     state = propertiesBrownBerg()
     memory = memoryBrownBerg(0)
 end # struct
