@@ -1,5 +1,4 @@
-export
-    step!, multistep!
+export step!
 
 @doc raw"""
     step!(bacterium::B, f::F; callback) where {B<:AbstractBacterium,F<:AbstractField}
