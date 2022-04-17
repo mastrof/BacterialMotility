@@ -5,15 +5,17 @@ export
 
 function propertiesBrumley(x...)
     DefaultPropertiesBrumley = Properties(
+        "IntegrationTimestep" => 0.1, # s
+        "SensoryTime" => 0.1, # s
         "ReceptorGain" => 50.0, # 1/μM
         "MotorGain" => 50.0, # 
-        "ChemotacticPrecision" => 6.0, # 
+        "ChemotacticPrecision" => 6.6, # 
         "InternalState" => 0.0, # 
-        "SensoryTime" => 0.1, # s
         "AdaptationTime" => 1.3, # s
         "RunTimeUnbiased" => 0.45, # s
         "NutrientDiffusivity" => 608.0, # μm²s
         "ReorientationRate" => 1/0.45, # 1/s
+        "RotationalDiffusivity" => 0.0349, # rad²/s
     )
     i = findfirst("SensoryTime" .== first.(x))
     j = findfirst("IntegrationTimestep" .== first.(x))
@@ -41,7 +43,7 @@ function propertiesBrumley(x...)
     end # if
 end # function
 
-function affect_Brumley!(bacterium, ϕ, ∇ϕ)
+function affect_Brumley!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
     r = bacterium.r
     v = bacterium.v
     Uᵣ = dot(v,r) / norm(r)
@@ -57,7 +59,7 @@ function affect_Brumley!(bacterium, ϕ, ∇ϕ)
     S = bacterium.state["InternalState"]
     α = exp(-T/tM) # memory persistence factor
     T³ = T*T*T
-    μ = Uᵣ * ∇ϕ # mean concentration gradient at current position
+    μ = Uᵣ*∇ϕ + ∂ₜϕ # mean concentration gradient at current position
     σ = Π * sqrt(3.0*ϕ / (π*a*Dc*T³)) # sensing noise at current position
     M = rand(Normal(μ,σ)) # gradient measurement
     S = (1-α)*κ*tM*M + α*S
@@ -73,7 +75,7 @@ end # function
     v::MVector{3,Float64} = zeros(MVector{3,Float64})
     run! = run!
     turn! = reverse_flick!
-    sense! = (b, f; kwargs...) -> sense_f_∇f!(b, f, affect_Brumley!; kwargs...)
+    sense! = (b, f; kwargs...) -> sense!(b, f, affect_Brumley!; kwargs...)
     state = propertiesBrumley()
 end # struct
 
