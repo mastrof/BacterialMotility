@@ -69,10 +69,10 @@ function affect_Brumley!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
 end # function
 
 
-@with_kw struct BacteriumBrumley <: AbstractBacterium{3,Float64}
+@with_kw struct BacteriumBrumley{D} <: AbstractBacterium{D,Float64}
     id::String = ""
-    r::MVector{3,Float64} = zeros(MVector{3,Float64})
-    v::MVector{3,Float64} = zeros(MVector{3,Float64})
+    r::MVector{D,Float64} = zeros(MVector{D,Float64})
+    v::MVector{D,Float64} = zeros(MVector{D,Float64})
     run! = run!
     turn! = reverse_flick!
     sense! = (b, f; kwargs...) -> sense!(b, f, affect_Brumley!; kwargs...)
