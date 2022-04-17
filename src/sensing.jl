@@ -4,5 +4,5 @@ function sense!(bacterium::B, f::F, affect!; kwargs...) where {B<:AbstractBacter
     ϕ = f.ϕ(bacterium; kwargs...)
     ∇ϕ = f.∇ϕ(bacterium; kwargs...)
     ∂ₜϕ = f.∂ₜϕ(bacterium; kwargs...)
-    affect!(bacterium, ϕ, ∇ϕ, ∂ₜϕ; kwargs...)
+    affect!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
 end # function
