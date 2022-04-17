@@ -23,3 +23,7 @@ The library currently includes:
 ![Random walk vs perfect chemotaxis vs noisy chemotaxis](https://github.com/mastrof/BacterialMotility/blob/main/scripts/brumley.gif)
 ### Chemotaxis (Brown and Berg 1974 PNAS)
 ![Random walk vs chemotaxis](https://github.com/mastrof/BacterialMotility/blob/main/scripts/brownberg.gif)
+### Multiple timestep integration
+![Multiple timestep integration](https://github.com/mastrof/BacterialMotility/blob/main/scripts/multiple-timestep.gif)
+### Hunting behavior
+![Species change their behavior to a hunting mode when their prey is within their radius of perception](https://github.com/mastrof/BacterialMotility/blob/main/scripts/prey-hunter.gif)
