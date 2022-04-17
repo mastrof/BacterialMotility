@@ -42,10 +42,10 @@ species = ["Random Walk", "Chemotaxis"]
 N = 50
 pop1 = [BacteriumBrownBerg{d}(
     id = species[1], r = randposition(), v = randvelocity(30.0),
-    state = copy(s1), memory = memoryBrownBerg(nsteps)) for _ in 1:N]
+    state = copy(s1)) for _ in 1:N]
 pop2 = [BacteriumBrownBerg{d}(
     id = species[2], r = randposition(), v = randvelocity(30.0),
-    state = copy(s2), memory = memoryBrownBerg(nsteps)) for _ in 1:N]
+    state = copy(s2)) for _ in 1:N]
 
 population = vcat(pop1, pop2)
 num_bacteria = length(population)
@@ -57,7 +57,7 @@ callback(b,f) = rotational_diffusion!(b)
 #== simulation ==#
 trajectories = zeros(nsteps, num_bacteria, d)
 for t in 1:nsteps
-    step!(population, f; callback_inner=callback)
+    step!(population, f; callback=callback)
     for n in 1:num_bacteria
         trajectories[t,n,:] .= population[n].r
     end # for
