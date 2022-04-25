@@ -46,7 +46,6 @@ end # function
 function affect_Brumley!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
     r = bacterium.r
     v = bacterium.v
-    Uᵣ = dot(v,r) / norm(r)
     dt = bacterium.state["IntegrationTimestep"]
     a = bacterium.state["Radius"]
     τ₀ = bacterium.state["RunTimeUnbiased"]
@@ -59,13 +58,20 @@ function affect_Brumley!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
     S = bacterium.state["InternalState"]
     α = exp(-T/tM) # memory persistence factor
     T³ = T*T*T
-    μ = Uᵣ*∇ϕ + ∂ₜϕ # mean concentration gradient at current position
+    μ = dot(v, ∇ϕ) + ∂ₜϕ # mean concentration gradient at current position
     σ = Π * sqrt(3.0*ϕ / (π*a*Dc*T³)) # sensing noise at current position
     M = rand(Normal(μ,σ)) # gradient measurement
     S = (1-α)*κ*tM*M + α*S
-    bacterium.state["InternalState"] = S
     ν = (1.0 + exp(-Γ*S)) / (2.0*τ₀)
-    bacterium.state["ReorientationRate"] = min(ν, 1.0/dt)
+    ν_max = 1.0/T
+    if ν > ν_max
+        # limit tumbling rate
+        bacterium.state["ReorientationRate"] = ν_max
+        # limit internal state
+        #bacterium.state["InternalState"] = -1/Γ * log(2*τ₀/T - 1)
+    else
+        bacterium.state["ReorientationRate"] = ν
+        bacterium.state["InternalState"] = S
 end # function
 
 

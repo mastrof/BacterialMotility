@@ -18,7 +18,6 @@ end # function
 function affect_BrownBerg!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
     r = bacterium.r
     v = bacterium.v
-    Uᵣ = dot(v,r) / norm(r)
     dt = bacterium.state["IntegrationTimestep"]
     tM = bacterium.state["AdaptationTime"]
     τ₀ = bacterium.state["RunTimeUnbiased"]
@@ -26,7 +25,7 @@ function affect_BrownBerg!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
     α = bacterium.state["MotorGain"]
     S = bacterium.state["InternalState"] # weighted dPb/dt @ previous step
     
-    dC_dt = Uᵣ*∇ϕ + ∂ₜϕ
+    dC_dt = dot(v,∇ϕ) + ∂ₜϕ
     M = KD / (KD + ϕ)^2 * dC_dt # dPb/dt, new gradient measurement
     S = M*dt/tM + S*exp(-dt/tM) # weighted dPb/dt
     bacterium.state["InternalState"] = S

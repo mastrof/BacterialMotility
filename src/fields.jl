@@ -15,12 +15,31 @@ end # struct
 
 EmptyField() = AnalyticField()
 
+
+
+@inline function ϕ_steadydiffspherical(b; kwargs...)
+    C = kwargs[:C]
+    Cbg = kwargs[:Cbg]
+    R = kwargs[:R]
+    r = norm(b.r)
+    Cbg + (C-Cbg) * R / r
+end # function
+                  
+@inline function ∇ϕ_steadydiffspherical(b; kwargs...)
+    C = kwargs[:C]
+    Cbg = kwargs[:Cbg]
+    R = kwargs[:R]
+    r = norm(b.r)
+    r³ = r*r*r
+    -C*R / r³ .* b.r
+end # function
+
 @with_kw struct Concentration_SteadyDiffusionSphericalSource_3D <: AbstractAnalyticField
     R::Float64 # μm, source radius
     C::Float64 # μM, concentration at source surface
     Cbg::Float64 = 0.0 # μM, background concentration
-    ϕ::Function = (b; kwargs...) -> Cbg + (C-Cbg)*R/norm(b.r) # concentration field
-    ∇ϕ::Function = (b; kwargs...) -> -C*R/(norm(b.r)^2) # concentration gradient (radial towards center)
+    ϕ::Function = ϕ_steadydiffspherical # concentration field
+    ∇ϕ::Function = ∇ϕ_steadydiffspherical  # concentration gradient (radial towards center)
     ∂ₜϕ::Function = zerofunc # no time derivative
 end # struct
 
