@@ -72,6 +72,7 @@ function affect_Brumley!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
     else
         bacterium.state["ReorientationRate"] = ν
         bacterium.state["InternalState"] = S
+    end # if
 end # function
 
 

@@ -5,6 +5,7 @@ export
 @with_kw struct BacterialSystem
     clock = [0] # Vector{Int}
     field = EmptyField() # AbstractField
+    boundary_conditions! = dummy
     callback_inner = dummy # Function
     callback_outer = dummy # Function
     population # AbstractVector{AbstractBacterium}
@@ -14,7 +15,7 @@ end # struct
 function integrate!(bs::BacterialSystem, nsteps::Int; kwargs...)
     for n in 1:nsteps
         step!(bs.population, bs.field;
-              callback=bs.callback_inner, kwargs...)
+              bcs! = bs.boundary_conditions!, callback=bs.callback_inner, kwargs...)
         bs.clock[1] += 1
         bs.callback_outer(bs; kwargs...)
     end # for
@@ -32,7 +33,7 @@ function integrate!(bs::BacterialSystem, T::Float64; kwargs...)
             accumulator[i] += δ[i]
             if accumulator[i] ≥ 1
                 step!(bs.population[i], bs.field;
-                      callback=bs.callback_inner, kwargs...)
+                      bcs! = bs.boundary_conditions!, callback=bs.callback_inner, kwargs...)
                 accumulator[i] -= 1
             end # if
         end # for
