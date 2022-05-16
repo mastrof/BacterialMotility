@@ -19,7 +19,7 @@ Collects all the information about the system to be integrated.
 """
 @with_kw struct BacterialSystem
     clock::Vector{Int} = [0]
-    stop::Bool = false
+    stop::Vector{Bool} = [false]
     field = EmptyField() # AbstractField
     boundary_conditions! = dummy # Function
     callback_inner = dummy # Function
