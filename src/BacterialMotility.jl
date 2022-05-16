@@ -13,7 +13,7 @@ include("bacterium.jl")
 include("fields.jl")
 include("motion.jl")
 include("sensing.jl")
-include("integration.jl")
+#include("integration.jl")
 include("bacterialsystem.jl")
 
 # model-specific implementations

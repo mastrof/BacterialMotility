@@ -43,7 +43,8 @@ function propertiesBrumley(x...)
     end # if
 end # function
 
-function affect_Brumley!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
+function affect_Brumley!(bacterialsystem, i, ϕ, ∇ϕ, ∂ₜϕ)
+    bacterium = bacterialsystem.population[i]
     r = bacterium.r
     v = bacterium.v
     dt = bacterium.state["IntegrationTimestep"]
@@ -68,7 +69,7 @@ function affect_Brumley!(bacterium, ϕ, ∇ϕ, ∂ₜϕ)
         # limit tumbling rate
         bacterium.state["ReorientationRate"] = ν_max
         # limit internal state
-        #bacterium.state["InternalState"] = -1/Γ * log(2*τ₀/T - 1)
+        bacterium.state["InternalState"] = -1/Γ * log(2*τ₀/T - 1)
     else
         bacterium.state["ReorientationRate"] = ν
         bacterium.state["InternalState"] = S
@@ -82,7 +83,7 @@ end # function
     v::MVector{D,Float64} = zeros(MVector{D,Float64})
     run! = run!
     turn! = reverse_flick!
-    sense! = (b, f; kwargs...) -> sense!(b, f, affect_Brumley!; kwargs...)
+    sense! = (bs, i) -> sense!(bs, i, affect_Brumley!)
     state = propertiesBrumley()
 end # struct
 

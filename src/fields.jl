@@ -17,7 +17,8 @@ EmptyField() = AnalyticField()
 
 
 
-@inline function ϕ_steadydiffspherical(b; kwargs...)
+@inline function ϕ_steadydiffspherical(bs, i; kwargs...)
+    b = bs.population[i]
     C = kwargs[:C]
     Cbg = kwargs[:Cbg]
     R = kwargs[:R]
@@ -25,7 +26,8 @@ EmptyField() = AnalyticField()
     Cbg + (C-Cbg) * R / r
 end # function
                   
-@inline function ∇ϕ_steadydiffspherical(b; kwargs...)
+@inline function ∇ϕ_steadydiffspherical(bs, i; kwargs...)
+    b = bs.population[i]
     C = kwargs[:C]
     Cbg = kwargs[:Cbg]
     R = kwargs[:R]
@@ -38,8 +40,8 @@ end # function
     R::Float64 # μm, source radius
     C::Float64 # μM, concentration at source surface
     Cbg::Float64 = 0.0 # μM, background concentration
-    ϕ::Function = ϕ_steadydiffspherical # concentration field
-    ∇ϕ::Function = ∇ϕ_steadydiffspherical  # concentration gradient (radial towards center)
+    ϕ::Function = (bs,i) -> ϕ_steadydiffspherical(bs, i; C=C, Cbg=Cbg, R=R) # concentration field
+    ∇ϕ::Function = (bs,i) -> ∇ϕ_steadydiffspherical(bs, i; C=C, Cbg=Cbg, R=R)  # concentration gradient (radial towards center)
     ∂ₜϕ::Function = zerofunc # no time derivative
 end # struct
 
