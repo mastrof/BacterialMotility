@@ -9,6 +9,7 @@ export
 
 Collects all the information about the system to be integrated.
     - `clock`: tracks the number of integration steps
+    - `stop`: can be turned to true with callbacks to stop integration when a certain condition is satisfied
     - `field`: external field(s) in which bacteria move (e.g. a concentration gradient) (<:AbstractField)
     - `boundary_conditions!`: function that enforces boundary conditions on the bacteria; takes only single bacterium
     - `callback_inner`: user-defined function called after the timestep of each bacterium; takes BacterialSystem and index of current bacterium (Int)
@@ -17,7 +18,8 @@ Collects all the information about the system to be integrated.
     - `population`: AbstractVector of <:AbstractBacterium whose motion is to be integrated
 """
 @with_kw struct BacterialSystem
-    clock::Vector{Int} = [0] # Vector{Int}
+    clock::Vector{Int} = [0]
+    stop::Bool = false
     field = EmptyField() # AbstractField
     boundary_conditions! = dummy # Function
     callback_inner = dummy # Function
@@ -61,6 +63,7 @@ function integrate!(bs::BacterialSystem, nsteps::Int)
         bs.clock[1] += 1
         bs.callback_outer(bs)
     end # for
+    bs.stop && break # if satisfied, interrupt integration
 end # function
 
 
