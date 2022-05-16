@@ -17,7 +17,7 @@ Collects all the information about the system to be integrated.
     - `population`: AbstractVector of <:AbstractBacterium whose motion is to be integrated
 """
 @with_kw struct BacterialSystem
-    clock = [0] # Vector{Int}
+    clock::Vector{Int} = [0] # Vector{Int}
     field = EmptyField() # AbstractField
     boundary_conditions! = dummy # Function
     callback_inner = dummy # Function
@@ -43,6 +43,7 @@ function step!(bs::BacterialSystem, i::Int)
         bacterium.turn!(bacterium)
     end # if
     bs.callback_inner(bs, i)
+    rotational_diffusion!(bacterium)
 end # function
 
 
@@ -60,7 +61,7 @@ function integrate!(bs::BacterialSystem, nsteps::Int)
         bs.clock[1] += 1
         bs.callback_outer(bs)
     end # for
-end # funtion
+end # function
 
 
 #== NOW BROKEN, NEEDS REVIEW ==#
