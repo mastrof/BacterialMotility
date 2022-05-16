@@ -4,7 +4,7 @@
 
 dummy(args...; kwargs...) = nothing
 
-zerofunc(b; kwargs...) = 0.0
+zerofunc(args...; kwargs...) = 0.0
 
 struct Degenerate{T<:Real} <: ContinuousUnivariateDistribution
     x::T
