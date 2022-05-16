@@ -46,7 +46,6 @@ tumble!(bacterium::B, PDF=Uniform(0,2π)) where B<:AbstractBacterium = rotate!(b
 
 function rotational_diffusion!(bacterium::B, PDF=σ->Normal(0,σ)) where B<:AbstractBacterium
     Drot = bacterium.state["RotationalDiffusivity"] # rad²/s
-    Drot == 0 && return
     dt = bacterium.state["IntegrationTimestep"] # s
     σ = sqrt(2*Drot*dt) # rad
     rotate!(bacterium.v, rand(PDF(σ)))
