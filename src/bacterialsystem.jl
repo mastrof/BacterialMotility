@@ -62,8 +62,8 @@ function integrate!(bs::BacterialSystem, nsteps::Int)
         end # for
         bs.clock[1] += 1
         bs.callback_outer(bs)
+        bs.stop && break # if satisfied, interrupt integration
     end # for
-    bs.stop && break # if satisfied, interrupt integration
 end # function
 
 
