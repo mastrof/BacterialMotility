@@ -10,8 +10,8 @@ end # function
 =#
 
 function sense!(bs, i, affect!)
-    ϕ = bs.f.ϕ(bs, i)
-    ∇ϕ = bs.f.∇ϕ(bs, i)
-    ∂ₜϕ = bs.f.∂ₜϕ(bs, i)
-    affect!(bs.population[i], ϕ, ∇ϕ, ∂ₜϕ)
+    ϕ = bs.field.ϕ(bs, i)
+    ∇ϕ = bs.field.∇ϕ(bs, i)
+    ∂ₜϕ = bs.field.∂ₜϕ(bs, i)
+    affect!(bs, i, ϕ, ∇ϕ, ∂ₜϕ)
 end # function
