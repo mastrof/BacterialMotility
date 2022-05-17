@@ -16,7 +16,7 @@ using Plots
 
 #== system geometry ==#
 L = 1e3 # box edge (μm)
-d = 2 # dimensionality
+d = 3 # dimensionality
 
 
 #== convenience functions ==#
@@ -51,18 +51,27 @@ pop4 = [Bacterium{d}(
     run! = run!, turn! = custom_revflick!, state = copy(s)) for _ in 1:N]
 
 population = vcat(pop1, pop2, pop3, pop4)
-num_bacteria = length(population)
+nsteps = 1000
+nbacteria = length(population)
 
+#== save routine ==#
+function save_position!(traj, bs)
+    nbacteria = size(traj, 2)
+    t = bs.clock[1]
+    for n in 1:nbacteria
+        traj[t,n,:] .= bs.population[n].r
+    end # for
+end # function
+
+trajectories = zeros(nsteps, nbacteria, d)
+save_position(bs) = save_position!(trajectories, bs)
+
+#== bacterial system ==#
+bs = BacterialSystem(population = population,
+                     callback_outer = save_position)
 
 #== simulation ==#
-nsteps = 1000
-trajectories = zeros(nsteps, num_bacteria, d)
-for t in 1:nsteps
-    step!(population)
-    for n in 1:num_bacteria
-        trajectories[t,n,:] .= population[n].r
-    end # for
-end # for
+integrate!(bs, nsteps)
 
 
 #== plot setup ==#
@@ -111,7 +120,7 @@ bgcolor = RGB(0.07, 0.07, 0.07)
 
 #== plot animation ==#
 ltail = 25
-for t in 2:2:nsteps
+for t in 2:3:0nsteps
     p = plot(;plot_style(:Dark2)...)
     plot!(p, lims=(-L/2,L/2), aspect_ratio=1, axis=false,
           bgcolor=bgcolor, size=(600,600))

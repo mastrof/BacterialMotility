@@ -6,7 +6,7 @@ using Plots
 
 #== system geometry ==#
 L = 1000 # μm
-d = 3 # dimensionality
+d = 2 # dimensionality
 
 #== convenience functions ==#
 randposition() = (rand(d) .- 1/2) .* (L/2)
@@ -23,7 +23,7 @@ custom_revflick!(bacterium) = reverse_flick!(bacterium, Normal(π,π/8), Normal(
 
 #== field setup ==#
 R = 20.0
-C = 1.0
+C = 20.0
 Cbg = 0.01
 f = Concentration_SteadyDiffusionSphericalSource_3D(R=R, C=C, Cbg=Cbg)
 
@@ -32,37 +32,47 @@ f = Concentration_SteadyDiffusionSphericalSource_3D(R=R, C=C, Cbg=Cbg)
 s1 = propertiesBrumley("MotorGain" => 0.0, "ReceptorGain" => 0.0,
                        "RotationalDiffusivity" => 0.035) # no chemotaxis
 s2 = propertiesBrumley("ChemotacticPrecision" => 0.0,
+                       "MotorGain" => 50.0, "ReceptorGain" => 50.0,
                        "RotationalDiffusivity" => 0.035) # perfect chemotaxis
-s3 = propertiesBrumley("ChemotacticPrecision" => 3.0,
+s3 = propertiesBrumley("ChemotacticPrecision" => 6.0,
+                       "MotorGain" => 50.0, "ReceptorGain" => 50.0,
                        "RotationalDiffusivity" => 0.035) # noisy chemotaxis
 
 species = ["Random Walk", "Perfect Chemotaxis", "Noisy Chemotaxis"]
-N = 50
-pop1 = [BacteriumBrumley(
+N = 20
+pop1 = [BacteriumBrumley{d}(
     id = species[1], r = randposition(), v = randvelocity(46.5),
     turn! = custom_revflick!, state = copy(s1)) for _ in 1:N]
-pop2 = [BacteriumBrumley(
+pop2 = [BacteriumBrumley{d}(
     id = species[2], r = randposition(), v = randvelocity(46.5),
-    turn! = custom_revflick!, state = copy(s2)) for _ in 1:10]
-pop3 = [BacteriumBrumley(
+    turn! = custom_revflick!, state = copy(s2)) for _ in 1:N]
+pop3 = [BacteriumBrumley{d}(
     id = species[3], r = randposition(), v = randvelocity(46.5),
     turn! = custom_revflick!, state = copy(s3)) for _ in 1:N]
 
 population = vcat(pop1, pop2, pop3)
-num_bacteria = length(population)
+nbacteria = length(population)
+nsteps = 1000
 
 #== callbacks ==#
-callback(b,f) = rotational_diffusion!(b)
+function save_position!(traj, bs)
+    nbacteria = size(traj, 2)
+    t = bs.clock[1]
+    for n in 1:nbacteria
+        traj[t,n,:] .= bs.population[n].r
+    end # for
+end # function
+
+trajectories = zeros(nsteps, nbacteria, d)
+save_position(bs) = save_position!(trajectories, bs)
+
+#== bacterial system ==#
+bs = BacterialSystem(population = population,
+                     field = f,
+                     callback_outer = save_position)
 
 #== simulation ==#
-nsteps = 800
-trajectories = zeros(nsteps, num_bacteria, d)
-for t in 1:nsteps
-    step!(population, f; callback_inner=callback)
-    for n in 1:num_bacteria
-        trajectories[t,n,:] .= population[n].r
-    end # for
-end # for
+integrate!(bs, nsteps)
 
 
 
@@ -121,8 +131,8 @@ bgcolor = RGB(0.07, 0.07, 0.07)
 
 #== plot animation ==#
 Δt = 0.1
-ltail = 17
-for t in 2:2:nsteps
+ltail = 20
+for t in 2:5:0nsteps
     p = plot(;plot_style(:Dark2)...)
     plot!(p, lims=(-L/2,L/2), aspect_ratio=1, axis=false,
           bgcolor=bgcolor,  size=(600,600))

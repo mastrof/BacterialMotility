@@ -23,14 +23,13 @@ custom_revflick!(bacterium) = reverse_flick!(bacterium, Normal(π,π/8), Normal(
 
 #== field setup ==#
 R = 20.0
-C = 1.0
+C = 5.0
 Cbg = 0.01
 f = Concentration_SteadyDiffusionSphericalSource_3D(R=R, C=C, Cbg=Cbg)
 
 
 #== population setup ==#
 Δt = 0.067 # s
-nsteps = 1200
 D_rot = 0.0325 # rad²/s
 s1 = propertiesBrownBerg("IntegrationTimestep" => Δt,
                          "RotationalDiffusivity" => D_rot,
@@ -41,27 +40,35 @@ s2 = propertiesBrownBerg("IntegrationTimestep" => Δt,
 species = ["Random Walk", "Chemotaxis"]
 N = 50
 pop1 = [BacteriumBrownBerg{d}(
-    id = species[1], r = randposition(), v = randvelocity(30.0),
+    id = species[1], r = randposition(), v = randvelocity(36.0),
     state = copy(s1)) for _ in 1:N]
 pop2 = [BacteriumBrownBerg{d}(
-    id = species[2], r = randposition(), v = randvelocity(30.0),
+    id = species[2], r = randposition(), v = randvelocity(36.0),
     state = copy(s2)) for _ in 1:N]
 
 population = vcat(pop1, pop2)
-num_bacteria = length(population)
+nbacteria = length(population)
+nsteps = 1000
 
 #== callbacks ==#
-callback(b,f) = rotational_diffusion!(b)
+function save_position!(traj, bs)
+    nbacteria = size(traj, 2)
+    t = bs.clock[1]
+    for n in 1:nbacteria
+        traj[t,n,:] .= bs.population[n].r
+    end # for
+end # function
 
+trajectories = zeros(nsteps, nbacteria, d)
+save_position(bs) = save_position!(trajectories, bs)
+
+#== bacterial system ==#
+bs = BacterialSystem(population = population,
+                     field = f,
+                     callback_outer = save_position)
 
 #== simulation ==#
-trajectories = zeros(nsteps, num_bacteria, d)
-for t in 1:nsteps
-    step!(population, f; callback=callback)
-    for n in 1:num_bacteria
-        trajectories[t,n,:] .= population[n].r
-    end # for
-end # for
+integrate!(bs, nsteps)
 
 
 
@@ -120,7 +127,7 @@ bgcolor = RGB(0.07, 0.07, 0.07)
 
 #== plot animation ==#
 ltail = 25
-for t in 2:4:nsteps
+for t in 2:4:0nsteps
     p = plot(;plot_style(:Dark2)...)
     plot!(p, lims=(-L/2,L/2), aspect_ratio=1, axis=false,
           bgcolor=bgcolor,  size=(600,600))

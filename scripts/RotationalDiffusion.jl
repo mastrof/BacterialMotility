@@ -1,13 +1,3 @@
-#=
-  Simulation of two-dimensional bacterial motility without chemosensing
-
-  Four different bacterial species (motile patterns):
-  1) Run-tumble with default reorientation distribution (Uniform(0,2π))
-  2) Run-tumble with custom reorientation distribution (Degenerate(π/4))
-  3) Run-reverse-flick with default reorientation distributions (reverse:Degenerate(π), flick:Degenerate(π/2))
-  4) Run-reverse-flick with custom reorientation distributions (reverse:Normal(π,π/8), flick:Uniform(3π/8,5π/8))
-=#
-
 using BacterialMotility
 using LinearAlgebra
 using Distributions
@@ -29,7 +19,7 @@ randvelocity(U) = randvelocity(d,U)
 
 #== population setup ==#
 Δt = 0.1 # s
-D_rot = 0.05 # rad²/s
+D_rot = 0.1 # rad²/s
 s1 = properties("IntegrationTimestep" => Δt)
 s2 = properties("IntegrationTimestep" => Δt,
                 "RotationalDiffusivity" => D_rot)
@@ -43,20 +33,28 @@ pop2 = [Bacterium{d}(
     run! = run!, turn! = tumble!, state = copy(s2)) for _ in 1:N]
 
 population = vcat(pop1, pop2)
-num_bacteria = length(population)
+nbacteria = length(population)
+nsteps = 100
 
-#== callbacks ==#
-callback(b,f) = rotational_diffusion!(b)
+
+#== save routine ==#
+function save_position!(traj, bs)
+    nbacteria = size(traj, 2)
+    t = bs.clock[1]
+    for n in 1:nbacteria
+        traj[t,n,:] .= bs.population[n].r
+    end # for
+end # function
+
+trajectories = zeros(nsteps, nbacteria, d)
+save_position(bs) = save_position!(trajectories, bs)
+
+#== bacterial system ==#
+bs = BacterialSystem(population = population,
+                     callback_outer = save_position)
 
 #== simulation ==#
-nsteps = 250
-trajectories = zeros(nsteps, num_bacteria, d)
-for t in 1:nsteps
-    step!(population; callback_inner=callback)
-    for n in 1:num_bacteria
-        trajectories[t,n,:] .= population[n].r
-    end # for
-end # for
+integrate!(bs, nsteps)
 
 
 #== plot setup ==#
@@ -105,7 +103,7 @@ bgcolor = RGB(0.07, 0.07, 0.07)
 
 #== plot animation ==#
 ltail = 35
-for t in 2:1:nsteps
+for t in 2:2:0nsteps
     p = plot(;plot_style(:Dark2)...)
     plot!(p, lims=(-L/2,L/2), aspect_ratio=1, axis=false,
           bgcolor=bgcolor, size=(600,600))
