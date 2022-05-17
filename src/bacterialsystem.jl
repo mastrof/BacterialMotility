@@ -3,7 +3,6 @@ export
     integrate!,
     step!
 
-
 @doc raw"""
     struct BacterialSystem
 
@@ -21,9 +20,9 @@ Collects all the information about the system to be integrated.
     clock::Vector{Int} = [0]
     stop::Vector{Bool} = [false]
     field = EmptyField() # AbstractField
-    boundary_conditions! = dummy # Function
-    callback_inner = dummy # Function
-    callback_outer = dummy # Function
+    boundary_conditions! = dummy_boundary_conditions # Function
+    callback_inner = dummy_callback_inner # Function
+    callback_outer = dummy_callback_outer # Function
     user_parameters = Dict() # might use better name
     population # AbstractVector{AbstractBacterium}
 end # struct
@@ -55,9 +54,8 @@ end # function
 Integrate the bacterial system `bs` for `nsteps` steps.
 """
 function integrate!(bs::BacterialSystem, nsteps::Int)
-    num_bacteria = length(bs.population)
     for n in 1:nsteps
-        for i in 1:num_bacteria
+        for i in eachindex(bs.population)
             step!(bs, i)
         end # for
         bs.clock[1] += 1

@@ -8,9 +8,9 @@ abstract type AbstractField end
 abstract type AbstractAnalyticField <: AbstractField end
 
 @with_kw struct AnalyticField <: AbstractAnalyticField
-    ϕ::Function = zerofunc
-    ∇ϕ::Function = zerofunc
-    ∂ₜϕ::Function = zerofunc
+    ϕ::Function = zeroscalar
+    ∇ϕ::Function = zerovector
+    ∂ₜϕ::Function = zeroscalar
 end # struct
 
 EmptyField() = AnalyticField()

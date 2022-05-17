@@ -1,6 +1,7 @@
 export
     AbstractBacterium, Bacterium
 
+
 @doc raw"""
     AbstractBacterium{D,T}
 
@@ -34,9 +35,9 @@ run! and turn! should only take an instance of AbstractBacterium as input; sense
     id::String = "" # identifier
     r::MVector{D,T} = zeros(MVector{D,T}) # position vector
     v::MVector{D,T} = zeros(MVector{D,T})# velocity vector
-    run! = dummy # displacement
-    turn! = dummy # reorientation
-    sense! = dummy # kinetic/tactic behavior
+    run! = dummy_run # displacement
+    turn! = dummy_turn # reorientation
+    sense! = dummy_sense # kinetic/tactic behavior
     state = properties()
 end # state
 
