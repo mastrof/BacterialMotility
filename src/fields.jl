@@ -42,7 +42,7 @@ end # function
     Cbg::Float64 = 0.0 # μM, background concentration
     ϕ::Function = (bs,i) -> ϕ_steadydiffspherical(bs, i; C=C, Cbg=Cbg, R=R) # concentration field
     ∇ϕ::Function = (bs,i) -> ∇ϕ_steadydiffspherical(bs, i; C=C, Cbg=Cbg, R=R)  # concentration gradient (radial towards center)
-    ∂ₜϕ::Function = zerofunc # no time derivative
+    ∂ₜϕ::Function = zeroscalar # no time derivative
 end # struct
 
 
