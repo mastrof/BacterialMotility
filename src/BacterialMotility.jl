@@ -20,6 +20,9 @@ include("sensing.jl")
 include("bacterium.jl")
 include("bacterialsystem.jl")
 
+# boundary conditions
+include("boundary_conditions.jl")
+
 # implementations of chemotaxis models
 include("Brumley.jl")
 include("BrownBerg.jl")
