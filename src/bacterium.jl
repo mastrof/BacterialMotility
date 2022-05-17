@@ -1,15 +1,5 @@
 export
-    AbstractBacterium, Bacterium
-
-
-@doc raw"""
-    AbstractBacterium{D,T}
-
-General interface for bacterium object.
-    - `D`: dimensionality of the space in which the bacterium lives
-    - `T`: type of the space in which the bacterium lives
-"""
-abstract type AbstractBacterium{D,T} end
+    Bacterium
 
 @doc raw"""
     struct Bacterium{D,T} <: AbstractBacterium{D,T}
@@ -35,7 +25,7 @@ run! and turn! should only take an instance of AbstractBacterium as input; sense
     id::String = "" # identifier
     r::MVector{D,T} = zeros(MVector{D,T}) # position vector
     v::MVector{D,T} = zeros(MVector{D,T})# velocity vector
-    run! = dummy_run # displacement
+    run! = run! # displacement
     turn! = dummy_turn # reorientation
     sense! = dummy_sense # kinetic/tactic behavior
     state = properties()

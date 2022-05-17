@@ -4,7 +4,7 @@ export
     step!
 
 @doc raw"""
-    struct BacterialSystem
+    struct BacterialSystem <: AbstractBacterialSystem
 
 Collects all the information about the system to be integrated.
     - `clock`: tracks the number of integration steps
@@ -16,7 +16,7 @@ Collects all the information about the system to be integrated.
     - `user_parameters`: collection of mutables for user-defined routines (e.g. Dict, user-defined struct, ...)
     - `population`: AbstractVector of <:AbstractBacterium whose motion is to be integrated
 """
-@with_kw struct BacterialSystem
+@with_kw struct BacterialSystem <: AbstractBacterialSystem
     clock::Vector{Int} = [0]
     stop::Vector{Bool} = [false]
     field = EmptyField() # AbstractField
@@ -29,11 +29,11 @@ end # struct
 
 
 @doc raw"""
-    step!(bs::BacterialSystem, i::Int)
+    step!(bs::AbstractBacterialSystem, i::Int)
 
 Perform a single integration step of bacterium indicated by index `i` in bacterial system `bs`.
 """
-function step!(bs::BacterialSystem, i::Int)
+function step!(bs::AbstractBacterialSystem, i::Int)
     bacterium = bs.population[i]
     dt = bacterium.state["IntegrationTimestep"]
     bacterium.run!(bacterium, dt)
@@ -49,11 +49,11 @@ end # function
 
 
 @doc raw"""
-    integrate!(bs::BacterialSystem, nsteps::Int)
+    integrate!(bs::AbstractBacterialSystem, nsteps::Int)
 
 Integrate the bacterial system `bs` for `nsteps` steps.
 """
-function integrate!(bs::BacterialSystem, nsteps::Int)
+function integrate!(bs::AbstractBacterialSystem, nsteps::Int)
     for n in 1:nsteps
         for i in eachindex(bs.population)
             step!(bs, i)

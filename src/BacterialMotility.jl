@@ -6,17 +6,21 @@ using Distributions
 using Rotations
 using Parameters
 
+# abstract types
+include("interface.jl")
+
+# utility functions
 include("utils.jl")
 
+# core
 include("properties.jl")
-include("bacterium.jl")
 include("fields.jl")
 include("motion.jl")
 include("sensing.jl")
-#include("integration.jl")
+include("bacterium.jl")
 include("bacterialsystem.jl")
 
-# model-specific implementations
+# implementations of chemotaxis models
 include("Brumley.jl")
 include("BrownBerg.jl")
 
